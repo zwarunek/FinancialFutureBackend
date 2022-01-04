@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AccountDetails {
-  private String first_name;
-  private String last_name;
+  private String firstName;
+  private String lastName;
   private String username;
   private String password;
 }

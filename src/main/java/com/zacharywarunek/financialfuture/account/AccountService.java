@@ -103,12 +103,21 @@ public class AccountService implements UserDetailsService {
       else account.setUsername(accountDetails.getUsername());
     if (accountDetails.getPassword() != null)
       account.setPassword(passwordEncoder.encode(accountDetails.getPassword()));
-    if (accountDetails.getFirst_name() != null
-        && !accountDetails.getFirst_name().equals(account.getFirstName()))
-      account.setFirstName(accountDetails.getFirst_name());
-    if (accountDetails.getFirst_name() != null
-        && !accountDetails.getLast_name().equals(account.getLastName()))
-      account.setLastName(accountDetails.getLast_name());
+    if (accountDetails.getFirstName() != null
+        && !accountDetails.getFirstName().equals(account.getFirstName()))
+      account.setFirstName(accountDetails.getFirstName());
+    if (accountDetails.getFirstName() != null
+        && !accountDetails.getLastName().equals(account.getLastName()))
+      account.setLastName(accountDetails.getLastName());
+    return account;
+  }
+
+  @Transactional
+  public Account changePassword(Account account, String password) throws BadRequestException {
+    if (password != null)
+      account.setPassword(passwordEncoder.encode(password));
+    else
+      throw new BadRequestException(ExceptionResponses.NULL_VALUES.label);
     return account;
   }
 
