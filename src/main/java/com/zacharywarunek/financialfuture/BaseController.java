@@ -8,6 +8,7 @@ import com.zacharywarunek.financialfuture.exceptions.UnauthorizedException;
 import com.zacharywarunek.financialfuture.util.AuthRequest;
 import com.zacharywarunek.financialfuture.util.recaptcha.ReCaptchaService;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -46,16 +47,18 @@ public class BaseController {
   }
 
   @PostMapping(path = "/authenticate")
-  public ResponseEntity<Account> authenticate(@RequestBody AuthRequest authRequest) {
+  public ResponseEntity<Object> authenticate(@RequestBody AuthRequest authRequest) {
     try {
       HttpHeaders headers = new HttpHeaders();
       headers.add("Authorization", accountService.authenticate(authRequest));
       logger.info(authRequest.getUsername() + " Authorized");
       return new ResponseEntity<>(accountService.findByUsername(authRequest.getUsername()), headers, HttpStatus.OK);
-    } catch (UnauthorizedException | EntityNotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+    } catch (EntityNotFoundException e) {
+      return ResponseEntity.ok().build();
     } catch (BadRequestException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (UnauthorizedException e) {
+      return ResponseEntity.ok(Collections.singletonMap("data", e.getMessage()));
     }
   }
 

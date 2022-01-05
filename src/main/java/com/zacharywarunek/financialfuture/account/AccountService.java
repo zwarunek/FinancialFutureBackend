@@ -11,6 +11,7 @@ import com.zacharywarunek.financialfuture.exceptions.EntityNotFoundException;
 import com.zacharywarunek.financialfuture.exceptions.ExceptionResponses;
 import com.zacharywarunek.financialfuture.exceptions.UnauthorizedException;
 import com.zacharywarunek.financialfuture.exceptions.UsernameTakenException;
+import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetTokenService;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationToken;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationTokenService;
 import com.zacharywarunek.financialfuture.util.AuthRequest;
@@ -36,6 +37,7 @@ public class AccountService implements UserDetailsService {
   protected final Log logger = LogFactory.getLog(getClass());
   private final PasswordEncoder passwordEncoder;
   private final ConfirmationTokenService confirmationTokenService;
+  private final PasswordResetTokenService passwordResetTokenService;
   AccountRepo accountRepo;
   JwtUtil jwtUtil;
 
@@ -57,7 +59,7 @@ public class AccountService implements UserDetailsService {
     return accountRepo.findAll();
   }
 
-  public String create(Account account) throws BadRequestException, UsernameTakenException {
+  public Account create(Account account) throws BadRequestException, UsernameTakenException {
     if (account.getPassword() == null
         || account.getUsername() == null
         || account.getLastName() == null
@@ -68,15 +70,7 @@ public class AccountService implements UserDetailsService {
           String.format(ExceptionResponses.USERNAME_TAKEN.label, account.getUsername()));
 
     account.setPassword(passwordEncoder.encode(account.getPassword()));
-    accountRepo.save(account);
-    String token = UUID.randomUUID().toString();
-    ConfirmationToken confirmationToken =
-        new ConfirmationToken(
-            token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), account);
-
-    confirmationTokenService.saveConfirmationToken(confirmationToken);
-
-    return token;
+    return accountRepo.save(account);
   }
 
   public String authenticate(AuthRequest authRequest)
@@ -124,6 +118,7 @@ public class AccountService implements UserDetailsService {
   public void delete(Long account_id) throws EntityNotFoundException {
     Account account = findById(account_id);
     confirmationTokenService.deleteAllAtAccount(account);
+    passwordResetTokenService.deleteAllAtAccount(account);
     accountRepo.deleteById(account.getId());
   }
 

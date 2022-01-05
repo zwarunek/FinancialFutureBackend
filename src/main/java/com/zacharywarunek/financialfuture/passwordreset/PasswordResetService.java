@@ -1,25 +1,20 @@
 package com.zacharywarunek.financialfuture.passwordreset;
 
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.EMAIL_ALREADY_CONFIRMED;
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.EXPIRED_TOKEN;
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.INVALID_TOKEN;
-
 import com.zacharywarunek.financialfuture.account.Account;
+import com.zacharywarunek.financialfuture.account.AccountInfo;
 import com.zacharywarunek.financialfuture.account.AccountService;
 import com.zacharywarunek.financialfuture.email.EmailService;
 import com.zacharywarunek.financialfuture.exceptions.BadRequestException;
 import com.zacharywarunek.financialfuture.exceptions.EntityNotFoundException;
-import com.zacharywarunek.financialfuture.exceptions.ExpiredTokenException;
-import com.zacharywarunek.financialfuture.exceptions.InvalidTokenException;
 import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetToken;
 import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetTokenService;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -28,25 +23,31 @@ public class PasswordResetService {
   private final PasswordResetTokenService passwordResetTokenService;
   private final EmailService emailService;
 
-  public Map<String, String> getAccountDetailsFromToken(String token)
-      throws InvalidTokenException, ExpiredTokenException {
-    PasswordResetToken passwordResetToken =
-        passwordResetTokenService
-            .getToken(token)
-            .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN.label));
-    if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now()))
-      throw new ExpiredTokenException(EXPIRED_TOKEN.label);
-    Map<String, String> map = new HashMap<>();
-    map.put("firstName", passwordResetToken.getAccount().getFirstName());
-    map.put("lastName", passwordResetToken.getAccount().getLastName());
-    map.put("username", passwordResetToken.getAccount().getUsername());
+  public Map<String, Object> getAccountDetailsFromToken(String token) {
+    Map<String, Object> map = new HashMap<>();
+    Optional<PasswordResetToken> passwordResetTokenOptional =
+        passwordResetTokenService.getToken(token);
+    if (passwordResetTokenOptional.isEmpty()) {
+      map.put("data", "Invalid Token");
+    } else {
+      PasswordResetToken passwordResetToken = passwordResetTokenOptional.get();
+      if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now()))
+        map.put("data", "Expired Token");
+      else {
+        map.put("data", "Successful");
+      }
+      map.put(
+          "account",
+          new AccountInfo(
+              passwordResetToken.getAccount().getFirstName(),
+              passwordResetToken.getAccount().getLastName(),
+              passwordResetToken.getAccount().getUsername()));
+    }
     return map;
   }
 
-  public void passwordReset(String username) throws EntityNotFoundException {
-
+  public void sendEmail(String username) throws EntityNotFoundException {
     Account account = accountService.findByUsername(username);
-
     String token = UUID.randomUUID().toString();
     PasswordResetToken passwordResetToken =
         new PasswordResetToken(
@@ -58,34 +59,24 @@ public class PasswordResetService {
     emailService.send(username, buildEmail(account.getFirstName(), link));
   }
 
-  @Transactional
-  public PasswordResetToken useToken(String token)
-      throws BadRequestException, EntityNotFoundException, InvalidTokenException,
-          ExpiredTokenException {
-    PasswordResetToken passwordResetToken =
-        passwordResetTokenService
-            .getToken(token)
-            .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN.label));
-    if (passwordResetToken.getCreatedAt().isAfter(LocalDateTime.now()))
-      throw new InvalidTokenException(INVALID_TOKEN.label);
-    accountService.findByUsername(passwordResetToken.getAccount().getUsername());
-    if (passwordResetToken.getUsedAt() != null)
-      throw new BadRequestException(EMAIL_ALREADY_CONFIRMED.label);
-    if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now()))
-      throw new ExpiredTokenException(EXPIRED_TOKEN.label);
-    return passwordResetToken;
-  }
-
-  public void changeUserPassword(String token, String password)
-      throws InvalidTokenException, ExpiredTokenException, BadRequestException {
-    PasswordResetToken passwordResetToken =
-        passwordResetTokenService
-            .getToken(token)
-            .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN.label));
-    if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now()))
-      throw new ExpiredTokenException(EXPIRED_TOKEN.label);
-    accountService.changePassword(passwordResetToken.getAccount(), password);
-    passwordResetTokenService.setUsedAt(token);
+  public Map<String, Object> changeUserPassword(String token, String password)
+      throws BadRequestException {
+    Map<String, Object> map = new HashMap<>();
+    Optional<PasswordResetToken> passwordResetTokenOptional =
+        passwordResetTokenService.getToken(token);
+    if (passwordResetTokenOptional.isEmpty()) {
+      map.put("data", "Invalid Token");
+    } else {
+      PasswordResetToken passwordResetToken = passwordResetTokenOptional.get();
+      if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now()))
+        map.put("data", "Expired Token");
+      else {
+        map.put("data", "Successful");
+        accountService.changePassword(passwordResetToken.getAccount(), password);
+        passwordResetTokenService.setUsedAt(token);
+      }
+    }
+    return map;
   }
 
   private String buildEmail(String name, String link) {
@@ -160,5 +151,4 @@ public class PasswordResetService {
         + "\n"
         + "</div></div>";
   }
-
 }

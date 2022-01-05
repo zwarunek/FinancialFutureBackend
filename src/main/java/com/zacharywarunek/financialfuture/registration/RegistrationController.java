@@ -5,6 +5,8 @@ import com.zacharywarunek.financialfuture.exceptions.EntityNotFoundException;
 import com.zacharywarunek.financialfuture.exceptions.ExpiredTokenException;
 import com.zacharywarunek.financialfuture.exceptions.InvalidTokenException;
 import com.zacharywarunek.financialfuture.exceptions.UsernameTakenException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +27,19 @@ public class RegistrationController {
 
   @PostMapping
   public ResponseEntity<Object> register(@RequestBody RegistrationRequest request) {
+    Map<String, String> map = new HashMap<>();
     try {
-      return ResponseEntity.ok(registrationService.register(request));
+      registrationService.register(request);
+      map.put("data", "Successful");
     } catch (UsernameTakenException e) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-    } catch (BadRequestException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      map.put("data", "Username Taken");
     }
+    catch (BadRequestException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (EntityNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+    return ResponseEntity.ok(map);
   }
 
   @GetMapping(path = "confirm")
@@ -41,10 +49,15 @@ public class RegistrationController {
       return ResponseEntity.ok(registrationService.confirmToken(token));
     } catch (BadRequestException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-    } catch (InvalidTokenException | ExpiredTokenException e) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-    } catch (EntityNotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     }
+  }
+
+  @PostMapping(path = "sendmail")
+  public ResponseEntity<Object> sendEmail(@RequestBody Map<String, String> data) {
+    try {
+      registrationService.sendEmail(data.get("username"));
+    } catch (EntityNotFoundException ignored) {
+    }
+    return ResponseEntity.ok().build();
   }
 }

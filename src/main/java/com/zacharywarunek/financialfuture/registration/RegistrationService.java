@@ -1,26 +1,23 @@
 package com.zacharywarunek.financialfuture.registration;
 
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.EMAIL_ALREADY_CONFIRMED;
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.EXPIRED_TOKEN;
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.INVALID_TOKEN;
-import static com.zacharywarunek.financialfuture.exceptions.ExceptionResponses.USERNAME_NOT_FOUND;
-
 import com.zacharywarunek.financialfuture.account.Account;
+import com.zacharywarunek.financialfuture.account.AccountInfo;
 import com.zacharywarunek.financialfuture.account.AccountRepo;
 import com.zacharywarunek.financialfuture.account.AccountRole;
 import com.zacharywarunek.financialfuture.account.AccountService;
 import com.zacharywarunek.financialfuture.email.EmailService;
 import com.zacharywarunek.financialfuture.exceptions.BadRequestException;
 import com.zacharywarunek.financialfuture.exceptions.EntityNotFoundException;
-import com.zacharywarunek.financialfuture.exceptions.ExpiredTokenException;
-import com.zacharywarunek.financialfuture.exceptions.InvalidTokenException;
 import com.zacharywarunek.financialfuture.exceptions.UsernameTakenException;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationToken;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationTokenService;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -31,44 +28,56 @@ public class RegistrationService {
   private final ConfirmationTokenService confirmationTokenService;
   private final EmailService emailService;
 
-  public String register(RegistrationRequest request)
-      throws UsernameTakenException, BadRequestException {
-
-    String token;
-    token =
-        accountService.create(
-            new Account(
-                request.getFirstName(),
-                request.getLastName(),
-                request.getUsername(),
-                request.getPassword(),
-                AccountRole.ROLE_USER));
-
-    String link = System.getenv("URL") + "/api/v1/registration/confirm?token=" + token;
-    emailService.send(request.getUsername(), buildEmail(request.getFirstName(), link));
-    return link;
+  public void register(RegistrationRequest request)
+      throws UsernameTakenException, BadRequestException, EntityNotFoundException {
+    accountService.create(
+        new Account(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getUsername(),
+            request.getPassword(),
+            AccountRole.ROLE_USER));
+    sendEmail(request.getUsername());
   }
 
-  @Transactional
-  public ConfirmationToken confirmToken(String token)
-      throws BadRequestException, EntityNotFoundException, InvalidTokenException,
-          ExpiredTokenException {
+  public void sendEmail(String username) throws EntityNotFoundException {
+
+    Account account = accountService.findByUsername(username);
+    String token = UUID.randomUUID().toString();
     ConfirmationToken confirmationToken =
-        confirmationTokenService
-            .getToken(token)
-            .orElseThrow(() -> new InvalidTokenException(INVALID_TOKEN.label));
-    if (confirmationToken.getCreated_at().isAfter(LocalDateTime.now()))
-      throw new InvalidTokenException(INVALID_TOKEN.label);
-    if (accountRepo.findAccountByUsername(confirmationToken.getAccount().getUsername()).isEmpty())
-      throw new EntityNotFoundException(
-          String.format(USERNAME_NOT_FOUND.label, confirmationToken.getAccount().getUsername()));
-    if (confirmationToken.getConfirmed_at() != null)
-      throw new BadRequestException(EMAIL_ALREADY_CONFIRMED.label);
-    if (confirmationToken.getExpires_at().isBefore(LocalDateTime.now()))
-      throw new ExpiredTokenException(EXPIRED_TOKEN.label);
-    confirmationTokenService.setConfirmedAt(token);
-    accountService.enable(confirmationToken.getAccount().getUsername());
-    return confirmationToken;
+        new ConfirmationToken(
+            token,
+            LocalDateTime.now(),
+            LocalDateTime.now().plusMinutes(15),
+            account);
+    confirmationTokenService.saveConfirmationToken(confirmationToken);
+    String link = System.getenv("FRONT_END_URL") + "/register/confirm?token=" + token;
+    emailService.send(username, buildEmail(account.getFirstName(), link));
+  }
+
+  public Map<String, Object> confirmToken(String token) throws BadRequestException {
+    Map<String, Object> map = new HashMap<>();
+    Optional<ConfirmationToken> confirmationTokenOptional =
+        confirmationTokenService.getToken(token);
+    if (confirmationTokenOptional.isEmpty()) {
+      map.put("data", "Invalid Token");
+    } else {
+      ConfirmationToken confirmationToken = confirmationTokenOptional.get();
+      if (confirmationToken.getExpires_at().isBefore(LocalDateTime.now()))
+        map.put("data", "Expired Token");
+      else {
+        map.put("data", "Successful");
+        confirmationTokenService.setConfirmedAt(token);
+        accountService.enable(confirmationToken.getAccount().getUsername());
+      }
+      map.put(
+          "account",
+          new AccountInfo(
+              confirmationToken.getAccount().getFirstName(),
+              confirmationToken.getAccount().getLastName(),
+              confirmationToken.getAccount().getUsername()));
+    }
+    return map;
   }
 
   private String buildEmail(String name, String link) {
