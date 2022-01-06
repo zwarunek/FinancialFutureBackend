@@ -22,7 +22,7 @@ public class PasswordResetController {
   private final PasswordResetService passwordResetService;
 
   @PostMapping
-  public ResponseEntity<Object> passwordReset(@RequestBody Map<String, String> data) {
+  public ResponseEntity<Object> sendEmail(@RequestBody Map<String, String> data) {
     try {
       passwordResetService.sendEmail(data.get("username"));
     } catch (EntityNotFoundException ignored) {
