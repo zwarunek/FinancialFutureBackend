@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.vestingschedule;
+package com.zacharywarunek.financialfuture.totalcompensation.vestingschedule;
 
 import com.zacharywarunek.financialfuture.util.JPA.IJPABaseRepo;
 

@@ -1,6 +1,6 @@
-package com.zacharywarunek.financialfuture.vestingschedule.vestingyear;
+package com.zacharywarunek.financialfuture.totalcompensation.vestingschedule.vestingyear;
 
-import com.zacharywarunek.financialfuture.vestingschedule.VestingSchedule;
+import com.zacharywarunek.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

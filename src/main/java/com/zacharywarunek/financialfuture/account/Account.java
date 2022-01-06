@@ -2,7 +2,8 @@ package com.zacharywarunek.financialfuture.account;
 
 import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetToken;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationToken;
-import com.zacharywarunek.financialfuture.vestingschedule.vestingyear.VestingYear;
+import com.zacharywarunek.financialfuture.totalcompensation.TotalCompensation;
+import com.zacharywarunek.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -45,6 +46,9 @@ public class Account implements UserDetails {
 
   @OneToMany(mappedBy = "account")
   private Set<PasswordResetToken> passwordResetTokens;
+
+  @OneToMany(mappedBy = "account")
+  private Set<TotalCompensation> totalCompensations;
 
   @Enumerated(EnumType.STRING)
   private AccountRole role;

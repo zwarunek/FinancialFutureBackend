@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.vestingschedule.stockgranttype;
+package com.zacharywarunek.financialfuture.totalcompensation.vestingschedule.stockgranttype;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,9 +1,10 @@
-package com.zacharywarunek.financialfuture.vestingschedule;
+package com.zacharywarunek.financialfuture.totalcompensation.vestingschedule;
 
 import com.zacharywarunek.financialfuture.account.Account;
 import com.zacharywarunek.financialfuture.company.Company;
-import com.zacharywarunek.financialfuture.vestingschedule.stockgranttype.StockGrantType;
-import com.zacharywarunek.financialfuture.vestingschedule.vestingyear.VestingYear;
+import com.zacharywarunek.financialfuture.totalcompensation.TotalCompensation;
+import com.zacharywarunek.financialfuture.totalcompensation.vestingschedule.stockgranttype.StockGrantType;
+import com.zacharywarunek.financialfuture.totalcompensation.vestingschedule.vestingyear.VestingYear;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,29 +38,23 @@ public class VestingSchedule {
   @JoinColumn(name = "type_id")
   private StockGrantType type;
 
-  @ManyToOne
-  @JoinColumn(name = "company_id")
-  private Company company;
-
   @Column(name = "rate", length = 1)
   private String rate;
-
-  @ManyToOne
-  @JoinColumn(name = "account_id")
-  private Account account;
 
   @OneToMany(mappedBy = "vestingSchedule")
   private Set<VestingYear> vestingYears;
 
+  @OneToOne
+  @JoinColumn(name = "total_compensation_id")
+  private TotalCompensation totalCompensation;
+
   public VestingSchedule(StockGrantType type, Company company, String rate) {
     this.type = type;
-    this.company = company;
     this.rate = rate;
   }
 
   public VestingSchedule(VestingScheduleDetail vestingScheduleDetail) {
     this.type = vestingScheduleDetail.type;
-    this.company = vestingScheduleDetail.company;
     this.rate = vestingScheduleDetail.rate;
   }
 }
