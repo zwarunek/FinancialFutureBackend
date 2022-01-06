@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.company.vestingschedule.stockgranttype;
+package com.zacharywarunek.financialfuture.vestingschedule.stockgranttype;
 
 import com.zacharywarunek.financialfuture.util.JPA.IJPABaseRepo;
 

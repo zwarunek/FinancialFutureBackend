@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.company.vestingschedule.vestingyear;
+package com.zacharywarunek.financialfuture.vestingschedule.vestingyear;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

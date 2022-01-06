@@ -1,8 +1,8 @@
-package com.zacharywarunek.financialfuture.company.vestingschedule;
+package com.zacharywarunek.financialfuture.vestingschedule;
 
 import com.zacharywarunek.financialfuture.account.Account;
 import com.zacharywarunek.financialfuture.company.Company;
-import com.zacharywarunek.financialfuture.company.vestingschedule.stockgranttype.StockGrantType;
+import com.zacharywarunek.financialfuture.vestingschedule.stockgranttype.StockGrantType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
