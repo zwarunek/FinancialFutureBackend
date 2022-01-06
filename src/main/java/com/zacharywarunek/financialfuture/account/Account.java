@@ -1,7 +1,11 @@
 package com.zacharywarunek.financialfuture.account;
 
+import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetToken;
+import com.zacharywarunek.financialfuture.registration.token.ConfirmationToken;
+import com.zacharywarunek.financialfuture.vestingschedule.vestingyear.VestingYear;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +39,12 @@ public class Account implements UserDetails {
   private String username;
   @Column(name = "password")
   private String password;
+
+  @OneToMany(mappedBy = "account")
+  private Set<ConfirmationToken> confirmationTokens;
+
+  @OneToMany(mappedBy = "account")
+  private Set<PasswordResetToken> passwordResetTokens;
 
   @Enumerated(EnumType.STRING)
   private AccountRole role;
