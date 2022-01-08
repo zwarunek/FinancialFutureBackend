@@ -27,12 +27,12 @@ public class AccountController {
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping
-  public ResponseEntity<List<Account>> getAll() {
+  public ResponseEntity<List<AccountInfo>> getAll() {
     return ResponseEntity.ok(accountService.getAll());
   }
 
   @PutMapping(path = "{account_id}")
-  public ResponseEntity<Account> update(
+  public ResponseEntity<AccountInfo> update(
       @PathVariable("account_id") Long account_id, @RequestBody AccountDetails accountDetails) {
     try {
       return ResponseEntity.ok(accountService.update(account_id, accountDetails));

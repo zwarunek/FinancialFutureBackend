@@ -12,13 +12,11 @@ import com.zacharywarunek.financialfuture.exceptions.ExceptionResponses;
 import com.zacharywarunek.financialfuture.exceptions.UnauthorizedException;
 import com.zacharywarunek.financialfuture.exceptions.UsernameTakenException;
 import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetTokenService;
-import com.zacharywarunek.financialfuture.registration.token.ConfirmationToken;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationTokenService;
 import com.zacharywarunek.financialfuture.util.AuthRequest;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class AccountService implements UserDetailsService {
 
-  protected final Log logger = LogFactory.getLog(getClass());
   private final PasswordEncoder passwordEncoder;
   private final ConfirmationTokenService confirmationTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
@@ -55,11 +52,11 @@ public class AccountService implements UserDetailsService {
             () -> new EntityNotFoundException(String.format(ACCOUNT_NOT_FOUND.label, username)));
   }
 
-  public List<Account> getAll() {
-    return accountRepo.findAll();
+  public List<AccountInfo> getAll() {
+    return accountRepo.findAll().stream().map(AccountInfo::new).collect(Collectors.toList());
   }
 
-  public Account create(Account account) throws BadRequestException, UsernameTakenException {
+  public void create(Account account) throws BadRequestException, UsernameTakenException {
     if (account.getPassword() == null
         || account.getUsername() == null
         || account.getLastName() == null
@@ -70,7 +67,7 @@ public class AccountService implements UserDetailsService {
           String.format(ExceptionResponses.USERNAME_TAKEN.label, account.getUsername()));
 
     account.setPassword(passwordEncoder.encode(account.getPassword()));
-    return accountRepo.save(account);
+    accountRepo.save(account);
   }
 
   public String authenticate(AuthRequest authRequest)
@@ -86,7 +83,7 @@ public class AccountService implements UserDetailsService {
   }
 
   @Transactional
-  public Account update(Long account_id, AccountDetails accountDetails)
+  public AccountInfo update(Long account_id, AccountDetails accountDetails)
       throws EntityNotFoundException, UsernameTakenException {
     Account account = findById(account_id);
     if (accountDetails.getUsername() != null
@@ -103,16 +100,15 @@ public class AccountService implements UserDetailsService {
     if (accountDetails.getFirstName() != null
         && !accountDetails.getLastName().equals(account.getLastName()))
       account.setLastName(accountDetails.getLastName());
-    return account;
+    return new AccountInfo(account);
   }
 
   @Transactional
-  public Account changePassword(Account account, String password) throws BadRequestException {
+  public void changePassword(Account account, String password) throws BadRequestException {
     if (password != null)
       account.setPassword(passwordEncoder.encode(password));
     else
       throw new BadRequestException(ExceptionResponses.NULL_VALUES.label);
-    return account;
   }
 
   public void delete(Long account_id) throws EntityNotFoundException {

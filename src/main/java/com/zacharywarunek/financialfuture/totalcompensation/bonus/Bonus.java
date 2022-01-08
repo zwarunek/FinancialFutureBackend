@@ -9,8 +9,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Table(name = "bonus")
 public class Bonus {
 
@@ -29,35 +37,9 @@ public class Bonus {
   @JoinColumn(name = "total_compensation_id")
   private TotalCompensation totalCompensation;
 
-  public TotalCompensation getTotalCompensation() {
-    return totalCompensation;
-  }
-
-  public void setTotalCompensation(TotalCompensation totalCompensation) {
-    this.totalCompensation = totalCompensation;
-  }
-
-  public Integer getDollarBonus() {
-    return dollarBonus;
-  }
-
-  public void setDollarBonus(Integer dollarBonus) {
-    this.dollarBonus = dollarBonus;
-  }
-
-  public Integer getYear() {
-    return year;
-  }
-
-  public void setYear(Integer year) {
+  public Bonus(Integer year, Integer dollarBonus, TotalCompensation totalCompensation) {
     this.year = year;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
+    this.dollarBonus = dollarBonus;
+    this.totalCompensation = totalCompensation;
   }
 }

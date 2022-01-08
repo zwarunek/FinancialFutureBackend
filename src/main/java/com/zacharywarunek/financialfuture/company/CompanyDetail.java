@@ -5,7 +5,5 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CompanyDetail {
   String name;
-  String logo;
-  String url;
-  String tickerSymbol;
+  String domain;
 }

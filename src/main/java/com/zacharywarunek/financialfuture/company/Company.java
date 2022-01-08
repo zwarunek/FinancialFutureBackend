@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,26 +28,17 @@ public class Company {
   @Column(name = "name", length = 1)
   private String name;
 
-  @Column(name = "logo", length = 1)
-  private String logo;
+  @Lob
+  @Column(name = "domain")
+  private String domain;
 
-  @Column(name = "url", length = 1)
-  private String url;
-
-  @Column(name = "ticker_symbol", length = 1)
-  private String tickerSymbol;
-
-  public Company(String name, String logo, String url, String tickerSymbol) {
+  public Company(String name, String domain) {
     this.name = name;
-    this.logo = logo;
-    this.url = url;
-    this.tickerSymbol = tickerSymbol;
+    this.domain = domain;
   }
 
   public Company(CompanyDetail companyDetail) {
     this.name = companyDetail.name;
-    this.logo = companyDetail.logo;
-    this.url = companyDetail.url;
-    this.tickerSymbol = companyDetail.tickerSymbol;
+    this.domain = companyDetail.domain;
   }
 }
