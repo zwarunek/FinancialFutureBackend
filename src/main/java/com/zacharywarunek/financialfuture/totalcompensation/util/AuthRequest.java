@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.util;
+package com.zacharywarunek.financialfuture.totalcompensation.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

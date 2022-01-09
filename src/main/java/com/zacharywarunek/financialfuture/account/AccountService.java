@@ -13,13 +13,11 @@ import com.zacharywarunek.financialfuture.exceptions.UnauthorizedException;
 import com.zacharywarunek.financialfuture.exceptions.UsernameTakenException;
 import com.zacharywarunek.financialfuture.passwordreset.token.PasswordResetTokenService;
 import com.zacharywarunek.financialfuture.registration.token.ConfirmationTokenService;
-import com.zacharywarunek.financialfuture.util.AuthRequest;
+import com.zacharywarunek.financialfuture.totalcompensation.util.AuthRequest;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -62,6 +60,7 @@ public class AccountService implements UserDetailsService {
         || account.getLastName() == null
         || account.getFirstName() == null)
       throw new BadRequestException(ExceptionResponses.NULL_VALUES.label);
+    Optional<Account> a = accountRepo.findAccountByUsername(account.getUsername());
     if (accountRepo.findAccountByUsername(account.getUsername()).isPresent())
       throw new UsernameTakenException(
           String.format(ExceptionResponses.USERNAME_TAKEN.label, account.getUsername()));

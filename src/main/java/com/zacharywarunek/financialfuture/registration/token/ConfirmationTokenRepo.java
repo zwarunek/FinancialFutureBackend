@@ -1,7 +1,7 @@
 package com.zacharywarunek.financialfuture.registration.token;
 
 import com.zacharywarunek.financialfuture.account.Account;
-import com.zacharywarunek.financialfuture.util.JPA.IJPABaseRepo;
+import com.zacharywarunek.financialfuture.totalcompensation.util.JPA.IJPABaseRepo;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;

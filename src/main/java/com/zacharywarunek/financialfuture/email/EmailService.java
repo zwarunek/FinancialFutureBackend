@@ -23,7 +23,7 @@ public class EmailService {
       helper.setText(email, true);
       helper.setTo(to);
       helper.setSubject("Confirm your email");
-      helper.setFrom("Financial Future <noreply@financialfuture.zacharywarunek.com>");
+      helper.setFrom("Financial Future <noreply@financialfuture.io>");
       mailSender.send(helper.getMimeMessage());
     } catch (Exception e) {
       LOGGER.error("failed to send email", e);

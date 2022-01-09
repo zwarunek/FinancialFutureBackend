@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.util.recaptcha;
+package com.zacharywarunek.financialfuture.totalcompensation.util.recaptcha;
 
 import java.io.BufferedReader;
 import java.io.IOException;

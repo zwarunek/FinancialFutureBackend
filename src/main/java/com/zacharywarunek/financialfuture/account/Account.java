@@ -41,15 +41,6 @@ public class Account implements UserDetails {
   @Column(name = "password")
   private String password;
 
-  @OneToMany(mappedBy = "account")
-  private Set<ConfirmationToken> confirmationTokens;
-
-  @OneToMany(mappedBy = "account")
-  private Set<PasswordResetToken> passwordResetTokens;
-
-  @OneToMany(mappedBy = "account")
-  private Set<TotalCompensation> totalCompensations;
-
   @Enumerated(EnumType.STRING)
   private AccountRole role;
 

@@ -1,6 +1,6 @@
 package com.zacharywarunek.financialfuture.account;
 
-import com.zacharywarunek.financialfuture.util.JPA.IJPABaseRepo;
+import com.zacharywarunek.financialfuture.totalcompensation.util.JPA.IJPABaseRepo;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

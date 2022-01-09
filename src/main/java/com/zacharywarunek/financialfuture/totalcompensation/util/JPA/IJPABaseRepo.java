@@ -1,4 +1,4 @@
-package com.zacharywarunek.financialfuture.util.JPA;
+package com.zacharywarunek.financialfuture.totalcompensation.util.JPA;
 
 import java.io.Serializable;
 import org.springframework.data.jpa.repository.JpaRepository;
