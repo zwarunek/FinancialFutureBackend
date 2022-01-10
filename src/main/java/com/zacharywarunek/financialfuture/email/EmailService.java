@@ -17,12 +17,12 @@ public class EmailService {
   private final JavaMailSender mailSender;
 
   @Async
-  public void send(String to, String email) {
+  public void send(String to, String email, String subject) {
     try {
       MimeMessageHelper helper = new MimeMessageHelper(mailSender.createMimeMessage(), "utf-8");
       helper.setText(email, true);
       helper.setTo(to);
-      helper.setSubject("Confirm your email");
+      helper.setSubject(subject);
       helper.setFrom("Financial Future <noreply@financialfuture.io>");
       mailSender.send(helper.getMimeMessage());
     } catch (Exception e) {
