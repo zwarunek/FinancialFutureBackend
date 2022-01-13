@@ -1,7 +1,6 @@
 package io.financialfuture.totalcompensation;
 
 import io.financialfuture.account.Account;
-import io.financialfuture.company.Company;
 import io.financialfuture.totalcompensation.bonus.Bonus;
 import io.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
 import java.util.Set;
@@ -39,24 +38,30 @@ public class TotalCompensation {
   @JoinColumn(name = "account_id")
   private Account account;
 
-  @ManyToOne
-  @JoinColumn(name = "company_id")
-  private Company company;
+  @Column(name = "company_name")
+  private String company;
 
-  @OneToOne(mappedBy = "totalCompensationId")
-  private VestingSchedule vestingSchedules;
+  @OneToOne(mappedBy = "totalCompensation")
+  private VestingSchedule vestingSchedule;
 
-  @OneToMany(mappedBy = "totalCompensationId")
+  @OneToMany(mappedBy = "totalCompensation")
   private Set<Bonus> bonuses;
 
-  @Column(name = "401k_match")
+  @Column(name = "_401k_match")
   private Integer _401kMatch;
 
-  @Column(name = "401k_match_ends")
+  @Column(name = "_401k_match_ends")
   private Integer _401kMatchEnds;
 
   @Lob
   @Column(name = "title")
   private String title;
 
+  public TotalCompensation(TotalCompensationDetail detail) {
+    this.salary = detail.getSalary();
+    this._401kMatch = detail.get_401kMatch();
+    this._401kMatchEnds = detail.get_401kMatchEnds();
+    this.title = detail.getTitle();
+    this.company = detail.getCompany();
+  }
 }

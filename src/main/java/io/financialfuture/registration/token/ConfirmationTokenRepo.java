@@ -23,5 +23,5 @@ public interface ConfirmationTokenRepo extends IJPABaseRepo<ConfirmationToken> {
   @Transactional
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("DELETE FROM ConfirmationToken WHERE account = ?1")
-  int deleteAllByAccountId(Account account);
+  void deleteAllByAccountId(Account account);
 }

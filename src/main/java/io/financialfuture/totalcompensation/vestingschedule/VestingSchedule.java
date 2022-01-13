@@ -1,13 +1,17 @@
 package io.financialfuture.totalcompensation.vestingschedule;
 
+import io.financialfuture.totalcompensation.TotalCompensation;
 import io.financialfuture.totalcompensation.vestingschedule.vestingyear.VestingYear;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +32,7 @@ public class VestingSchedule {
   private Integer id;
 
 
-  @Column(name = "rate", length = 1)
+  @Column(name = "rate", length = 20)
   private String rate;
 
   @OneToMany(mappedBy = "vestingSchedule")
@@ -37,13 +41,17 @@ public class VestingSchedule {
   @Column(name = "comp")
   private Integer comp;
 
-  @Column(name = "total_compensation_id")
-  private Integer totalCompensationId;
+  @OneToOne
+  @JoinColumn(name = "total_compensation_id")
+  private TotalCompensation totalCompensation;
 
 
-  public VestingSchedule(VestingScheduleDetail vestingScheduleDetail) {
+  public VestingSchedule(VestingScheduleDetail vestingScheduleDetail,
+      TotalCompensation totalCompensation) {
     this.comp = vestingScheduleDetail.comp;
     this.rate = vestingScheduleDetail.rate;
-    this.vestingYears = vestingScheduleDetail.vestingYears;
+    this.vestingYears = vestingScheduleDetail.vestingYears.stream()
+        .map(e -> new VestingYear(e, this)).collect(Collectors.toSet());
+    this.totalCompensation = totalCompensation;
   }
 }

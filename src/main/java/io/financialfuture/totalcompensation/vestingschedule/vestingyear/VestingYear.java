@@ -30,20 +30,22 @@ public class VestingYear {
   @Column(name = "year")
   private Integer year;
 
-  @Column(name = "percent")
-  private Integer percent;
 
   @ManyToOne
   @JoinColumn(name = "vesting_schedule_id")
   private VestingSchedule vestingSchedule;
+
+  @Column(name = "\"percent\"")
+  private Integer percent;
 
   public VestingYear(Integer year, Integer percent) {
     this.year = year;
     this.percent = percent;
   }
 
-  public VestingYear(VestingYearDetail vestingYearDetail) {
+  public VestingYear(VestingYearDetail vestingYearDetail, VestingSchedule vestingSchedule) {
     this.year = vestingYearDetail.year;
     this.percent = vestingYearDetail.percent;
+    this.vestingSchedule = vestingSchedule;
   }
 }

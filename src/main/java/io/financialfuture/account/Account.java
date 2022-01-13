@@ -1,7 +1,9 @@
 package io.financialfuture.account;
 
+import io.financialfuture.totalcompensation.TotalCompensation;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,14 +38,17 @@ public class Account implements UserDetails {
   @Column(name = "password")
   private String password;
 
+  @OneToMany(mappedBy = "account")
+  private Set<TotalCompensation> totalCompensations;
+
   @Enumerated(EnumType.STRING)
   private AccountRole role;
 
   private Boolean locked = false;
   private Boolean enabled = false;
 
-  public Account(
-      String firstName, String lastName, String username, String password, AccountRole role) {
+  public Account(String firstName, String lastName, String username, String password,
+      AccountRole role) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.username = username;

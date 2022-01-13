@@ -33,12 +33,19 @@ public class Bonus {
   @Column(name = "dollar_bonus")
   private Integer dollarBonus;
 
-  @Column(name = "total_compensation_id")
-  private Integer totalCompensationId;
+  @ManyToOne
+  @JoinColumn(name = "total_compensation_id")
+  private TotalCompensation totalCompensation;
 
-  public Bonus(Integer year, Integer dollarBonus, Integer totalCompensationId) {
+  public Bonus(Integer year, Integer dollarBonus, TotalCompensation totalCompensation) {
     this.year = year;
     this.dollarBonus = dollarBonus;
-    this.totalCompensationId = totalCompensationId;
+    this.totalCompensation = totalCompensation;
+  }
+
+  public Bonus(BonusDetail bonusDetail, TotalCompensation totalCompensation) {
+    this.year = bonusDetail.getYear();
+    this.dollarBonus = bonusDetail.getDollarBonus();
+    this.totalCompensation = totalCompensation;
   }
 }
