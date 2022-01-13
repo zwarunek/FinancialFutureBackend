@@ -1,11 +1,13 @@
 package io.financialfuture.totalcompensation;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.account.Account;
 import io.financialfuture.totalcompensation.bonus.Bonus;
 import io.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,6 +26,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "total_compensation")
+@JsonIgnoreProperties({"account"})
 public class TotalCompensation {
 
   @Id
@@ -34,7 +37,7 @@ public class TotalCompensation {
   @Column(name = "salary")
   private Integer salary;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id")
   private Account account;
 

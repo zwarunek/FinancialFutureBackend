@@ -1,5 +1,8 @@
 package io.financialfuture.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.financialfuture.passwordreset.token.PasswordResetToken;
+import io.financialfuture.registration.token.ConfirmationToken;
 import io.financialfuture.totalcompensation.TotalCompensation;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @NoArgsConstructor
 @Entity
+@JsonIgnoreProperties({"totalCompensations"})
 public class Account implements UserDetails {
 
   @Id
@@ -38,8 +43,14 @@ public class Account implements UserDetails {
   @Column(name = "password")
   private String password;
 
-  @OneToMany(mappedBy = "account")
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
   private Set<TotalCompensation> totalCompensations;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+  private Set<PasswordResetToken> passwordResetTokens;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+  private Set<ConfirmationToken> confirmationTokens;
 
   @Enumerated(EnumType.STRING)
   private AccountRole role;
