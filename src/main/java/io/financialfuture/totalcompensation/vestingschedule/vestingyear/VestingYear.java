@@ -1,5 +1,6 @@
 package io.financialfuture.totalcompensation.vestingschedule.vestingyear;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "vesting_year")
+@JsonIgnoreProperties({"vestingSchedule"})
 public class VestingYear {
 
   @Id

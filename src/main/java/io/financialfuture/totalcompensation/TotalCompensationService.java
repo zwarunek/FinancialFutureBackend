@@ -8,11 +8,13 @@ import io.financialfuture.totalcompensation.bonus.Bonus;
 import io.financialfuture.totalcompensation.bonus.BonusService;
 import io.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
 import io.financialfuture.totalcompensation.vestingschedule.VestingScheduleService;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -53,5 +55,49 @@ public class TotalCompensationService {
     vestingScheduleService.deleteAllAtTotalCompensation(totalCompensation);
     totalCompensationRepo.deleteById(totalCompensationId);
 
+  }
+
+  @Transactional
+  public void update(Integer totalCompensationId, TotalCompensationDetail tcDetails)
+      throws EntityNotFoundException {
+    TotalCompensation tc = findById(totalCompensationId);
+    if (tcDetails.getSalary() != null) {
+      tc.setSalary(tcDetails.getSalary());
+    }
+    if (tcDetails.getCompany() != null) {
+      tc.setCompany(tcDetails.getCompany());
+    }
+    if (tcDetails.get_401kMatch() != null) {
+      tc.set_401kMatch(tcDetails.get_401kMatch());
+    }
+    if (tcDetails.get_401kMatchEnds() != null) {
+      tc.set_401kMatchEnds(tcDetails.get_401kMatchEnds());
+    }
+    if (tcDetails.getTitle() != null) {
+      tc.setTitle(tcDetails.getTitle());
+    }
+    bonusService.deleteAllAtTotalCompensation(tc);
+    bonusService.createBonus(
+        tcDetails.getBonuses().stream().map(e -> new Bonus(e, tc)).collect(Collectors.toSet()));
+    vestingScheduleService.update(tc.getVestingSchedule(), tcDetails.getVestingSchedule());
+  }
+
+  public List<TotalCompensation> findAllByAccount() throws EntityNotFoundException {
+    return totalCompensationRepo.findAllByAccount(accountService.findByUsername(
+        ((UserDetails) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal()).getUsername()));
+  }
+
+  public List<TotalCompensation> findAllByCompany(String company) throws EntityNotFoundException {
+    return totalCompensationRepo.findAllByAccountAndCompany(accountService.findByUsername(
+        ((UserDetails) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal()).getUsername()), company);
+  }
+
+  public List<TotalCompensation> findAllByCompanyList(List<String> companyList)
+      throws EntityNotFoundException {
+    return totalCompensationRepo.findAllByAccountAndCompanyIn(accountService.findByUsername(
+        ((UserDetails) SecurityContextHolder.getContext().getAuthentication()
+            .getPrincipal()).getUsername()), companyList);
   }
 }

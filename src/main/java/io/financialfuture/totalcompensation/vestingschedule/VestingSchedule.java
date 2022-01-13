@@ -1,8 +1,9 @@
 package io.financialfuture.totalcompensation.vestingschedule;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.totalcompensation.TotalCompensation;
 import io.financialfuture.totalcompensation.vestingschedule.vestingyear.VestingYear;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "vesting_schedule")
+@JsonIgnoreProperties({"totalCompensation"})
 public class VestingSchedule {
 
   @Id
@@ -36,7 +39,8 @@ public class VestingSchedule {
   private String rate;
 
   @OneToMany(mappedBy = "vestingSchedule")
-  private Set<VestingYear> vestingYears;
+  @OrderBy("year")
+  private List<VestingYear> vestingYears;
 
   @Column(name = "comp")
   private Integer comp;
@@ -51,7 +55,7 @@ public class VestingSchedule {
     this.comp = vestingScheduleDetail.comp;
     this.rate = vestingScheduleDetail.rate;
     this.vestingYears = vestingScheduleDetail.vestingYears.stream()
-        .map(e -> new VestingYear(e, this)).collect(Collectors.toSet());
+        .map(e -> new VestingYear(e, this)).collect(Collectors.toList());
     this.totalCompensation = totalCompensation;
   }
 }

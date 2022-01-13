@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.account.Account;
 import io.financialfuture.totalcompensation.bonus.Bonus;
 import io.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
-import java.util.Set;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,6 +16,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,7 +49,8 @@ public class TotalCompensation {
   private VestingSchedule vestingSchedule;
 
   @OneToMany(mappedBy = "totalCompensation")
-  private Set<Bonus> bonuses;
+  @OrderBy("year")
+  private List<Bonus> bonuses;
 
   @Column(name = "_401k_match")
   private Integer _401kMatch;
