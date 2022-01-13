@@ -1,6 +1,7 @@
 package io.financialfuture.registration.token;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.account.Account;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "confirmation_token")
+@JsonIgnoreProperties({"account"})
 public class ConfirmationToken implements Serializable {
 
   @Id

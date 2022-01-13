@@ -1,6 +1,7 @@
 package io.financialfuture.passwordreset.token;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.account.Account;
 import java.time.LocalDateTime;
 import javax.persistence.Basic;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "password_reset_token")
+@JsonIgnoreProperties({"account"})
 public class PasswordResetToken {
 
   @GeneratedValue(strategy = GenerationType.IDENTITY)

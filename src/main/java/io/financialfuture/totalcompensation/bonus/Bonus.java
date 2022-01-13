@@ -1,5 +1,6 @@
 package io.financialfuture.totalcompensation.bonus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.financialfuture.totalcompensation.TotalCompensation;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "bonus")
+@JsonIgnoreProperties({"totalCompensation"})
 public class Bonus {
 
   @Id

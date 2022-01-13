@@ -1,7 +1,7 @@
 package io.financialfuture.totalcompensation.vestingschedule.vestingyear;
 
 import io.financialfuture.totalcompensation.vestingschedule.VestingSchedule;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ public class VestingYearService {
 
   private VestingYearRepo vestingYearRepo;
 
-  public void createVestingSchedule(Set<VestingYear> vestingYear) {
+  public void createVestingSchedule(List<VestingYear> vestingYear) {
     vestingYearRepo.saveAll(vestingYear);
   }
 
