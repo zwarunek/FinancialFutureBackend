@@ -1,5 +1,7 @@
 package io.financialfuture.totalcompensation.vestingschedule;
 
+import io.financialfuture.exceptions.EntityNotFoundException;
+import io.financialfuture.exceptions.ExceptionResponses;
 import io.financialfuture.totalcompensation.TotalCompensation;
 import io.financialfuture.totalcompensation.vestingschedule.vestingyear.VestingYear;
 import io.financialfuture.totalcompensation.vestingschedule.vestingyear.VestingYearService;
@@ -15,6 +17,11 @@ public class VestingScheduleService {
   private VestingScheduleRepo vestingScheduleRepo;
   private VestingYearService vestingYearService;
 
+  public VestingSchedule findById(Integer vestingScheduleId) throws EntityNotFoundException {
+    return vestingScheduleRepo.findById(vestingScheduleId).orElseThrow(
+            () -> new EntityNotFoundException(
+                    String.format(ExceptionResponses.ACCOUNT_NOT_FOUND.label, vestingScheduleId)));
+  }
 
   public void createVestingSchedule(VestingSchedule vestingSchedule) {
     vestingScheduleRepo.save(vestingSchedule);
@@ -28,7 +35,9 @@ public class VestingScheduleService {
   }
 
   @Transactional
-  public void update(VestingSchedule vestingSchedule, VestingScheduleDetail vestingScheduleDetail) {
+  public void update(Integer vestingScheduleId, VestingScheduleDetail vestingScheduleDetail)
+          throws EntityNotFoundException {
+    VestingSchedule vestingSchedule = findById(vestingScheduleId);
     if (vestingScheduleDetail.getComp() != null) {
       vestingSchedule.setComp(vestingScheduleDetail.getComp());
     }

@@ -80,7 +80,7 @@ public class TotalCompensationService {
     bonusService.deleteAllAtTotalCompensation(tc);
     bonusService.createBonus(
         tcDetails.getBonuses().stream().map(e -> new Bonus(e, tc)).collect(Collectors.toSet()));
-    vestingScheduleService.update(tc.getVestingSchedule(), tcDetails.getVestingSchedule());
+    vestingScheduleService.update(tc.getVestingSchedule().getId(), tcDetails.getVestingSchedule());
   }
 
   public List<TotalCompensation> findAllByAccount() throws EntityNotFoundException {
