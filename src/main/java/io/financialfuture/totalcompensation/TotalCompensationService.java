@@ -33,6 +33,7 @@ public class TotalCompensationService {
 
   public void create(TotalCompensationDetail tcDetails)
       throws BadRequestException, EntityNotFoundException {
+
     if (tcDetails.getSalary() == null || tcDetails.getCompany() == null
         || tcDetails.getVestingSchedule() == null || tcDetails.getBonuses() == null
         || tcDetails.get_401kMatch() == null || tcDetails.get_401kMatchEnds() == null) {

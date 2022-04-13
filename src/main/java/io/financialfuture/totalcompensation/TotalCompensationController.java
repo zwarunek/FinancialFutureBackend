@@ -73,11 +73,13 @@ public class TotalCompensationController {
   }
 
   @DeleteMapping(path = "{total_compensation_id}")
-  public ResponseEntity<String> delete(
+  public ResponseEntity<Object> delete(
       @PathVariable("total_compensation_id") Integer totalCompensationId) {
+    Map<String, String> map = new HashMap<>();
     try {
       totalCompensationService.delete(totalCompensationId);
-      return ResponseEntity.ok("Deleted Total Compensation");
+      map.put("data", "Successful");
+      return ResponseEntity.ok(map);
     } catch (EntityNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     }
